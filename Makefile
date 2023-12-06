@@ -4,6 +4,11 @@ install:
 lint:
 	npx eslint .
 
-test:
-	npx jest
+develop:
+	npx webpack serve
 
+build:
+	NODE_ENV=production npx webpack
+
+rm-build:
+	rm -rf dist
