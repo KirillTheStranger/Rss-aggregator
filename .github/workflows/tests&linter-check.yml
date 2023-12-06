@@ -1,0 +1,13 @@
+name: tests&linter-check
+
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: make install-deps
+      - run: make lint
+      - run: make test
