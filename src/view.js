@@ -1,6 +1,7 @@
-export default (state) => (path, value) => {
+export default (state) => (path) => {
   const feedback = document.querySelector('.feedback');
   const input = document.querySelector('#url-input');
+  const form = document.querySelector('.rss-form');
 
   switch (path) {
     case 'form.process.error': {
@@ -33,6 +34,8 @@ export default (state) => (path, value) => {
       if (state.form.valid === true) {
         feedback.classList.replace('text-danger', 'text-success');
         feedback.textContent = 'RSS успешно загружен';
+        form.reset();
+        input.focus();
       }
 
       if (state.form.valid === false) {
@@ -40,8 +43,8 @@ export default (state) => (path, value) => {
       }
       break;
     }
-    // default: {
-    //   throw new Error(`Uknown path: ${path}`);
-    // }
+    default: {
+      // throw new Error(`Uknown path: ${path}`);
+    }
   }
 };

@@ -7,7 +7,8 @@ const app = () => {
     form: {
       process: {
         state: 'filling', // sending sent error
-        error: null, //invalidLink noRss alreadyAdded
+
+        error: null, // invalidLink noRss alreadyAdded
       },
       valid: null, // true false
     },
@@ -38,8 +39,6 @@ const app = () => {
         state.form.process.state = 'sent';
         state.form.valid = true;
         state.form.process.error = null;
-        form.reset();
-        form.querySelector('input').focus();
       })
       .catch((error) => {
         state.form.process.error = error.message;
