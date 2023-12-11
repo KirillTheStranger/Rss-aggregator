@@ -1,7 +1,7 @@
 import onChange from 'on-change';
 import * as yup from 'yup';
-import view from './view.js';
 import i18next from 'i18next';
+import view from './view.js';
 import ru from '../locales/ru.js';
 
 const app = () => {
