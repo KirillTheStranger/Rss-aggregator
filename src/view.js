@@ -1,4 +1,4 @@
-export default (state) => (path) => {
+export default (state, i18nInstance) => (path) => {
   const feedback = document.querySelector('.feedback');
   const input = document.querySelector('#url-input');
   const form = document.querySelector('.rss-form');
@@ -7,17 +7,17 @@ export default (state) => (path) => {
     case 'form.process.error': {
       switch (state.form.process.error) {
         case 'invalidLink': {
-          feedback.textContent = 'Ссылка должна быть валидным URL';
+          feedback.textContent = i18nInstance.t('errors.invalidLink');
           input.classList.add('is-invalid');
           break;
         }
         case 'alreadyAdded': {
-          feedback.textContent = 'RSS уже существует';
+          feedback.textContent = i18nInstance.t('errors.alreadyAdded');
           input.classList.add('is-invalid');
           break;
         }
         case 'noRss': {
-          feedback.textContent = 'Ресурс не содержит валидный RSS';
+          feedback.textContent = i18nInstance.t('errors.noRss');
           break;
         }
         case null: {
@@ -33,7 +33,7 @@ export default (state) => (path) => {
     case 'form.valid': {
       if (state.form.valid === true) {
         feedback.classList.replace('text-danger', 'text-success');
-        feedback.textContent = 'RSS успешно загружен';
+        feedback.textContent = i18nInstance.t('uploaded');
         form.reset();
         input.focus();
       }

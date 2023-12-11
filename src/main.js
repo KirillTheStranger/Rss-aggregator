@@ -1,6 +1,8 @@
 import onChange from 'on-change';
 import * as yup from 'yup';
 import view from './view.js';
+import i18next from 'i18next';
+import ru from '../locales/ru.js';
 
 const app = () => {
   const initialState = {
@@ -15,7 +17,16 @@ const app = () => {
     listFeed: [],
   };
 
-  const state = onChange(initialState, view(initialState));
+  const i18nInstance = i18next.createInstance();
+
+  i18nInstance.init({
+    lng: 'ru',
+    resources: {
+      ru,
+    },
+  });
+
+  const state = onChange(initialState, view(initialState, i18nInstance));
 
   const form = document.querySelector('.rss-form');
 
