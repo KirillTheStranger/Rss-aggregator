@@ -108,7 +108,7 @@ export default (state, i18nInstance) => (path) => {
 
         listItem.append(link, button);
 
-        listGroup.append(listItem);
+        listGroup.prepend(listItem);
       });
 
       break;
