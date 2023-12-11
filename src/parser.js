@@ -1,5 +1,5 @@
 const parseRss = (link) => {
-  const listOfRss = fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(link)}`)
+  const parsedRss = fetch(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(link)}`)
     .then((response) => {
       if (response.ok) {
         return response.json();
@@ -9,15 +9,14 @@ const parseRss = (link) => {
     .then((data) => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(data.contents, 'application/xml');
-      const list = doc.querySelectorAll('item');
-
-      if (list.length === 0) {
+      const rss = doc.querySelector('rss');
+      if (!rss) {
         throw new Error('noRss');
       }
 
-      return list;
+      return rss;
     });
-  return listOfRss;
+  return parsedRss;
 };
 
 export default parseRss;
