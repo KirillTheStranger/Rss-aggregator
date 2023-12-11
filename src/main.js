@@ -3,6 +3,7 @@ import * as yup from 'yup';
 import i18next from 'i18next';
 import view from './view.js';
 import ru from '../locales/ru.js';
+import parseRss from './parser.js';
 
 const app = () => {
   const initialState = {
@@ -32,19 +33,25 @@ const app = () => {
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const { value } = form.elements.url;
+    const url = form.elements.url.value;
 
     const urlSchema = yup.object({
       url: yup.string().url('invalidLink').notOneOf(state.listFeed, 'alreadyAdded'),
     });
-    const validation = urlSchema.validate({ url: value });
+    const validation = urlSchema.validate({ url });
 
     validation
       .then(() => {
+        parseRss(url).catch((error) => {
+          state.form.process.error = error.message;
+          state.form.process.state = 'error';
+          state.form.valid = false;
+        });
         state.form.process.state = 'sending';
       })
       .then(() => {
-        state.listFeed.push(value);
+        state.listFeed.push(url);
+        console.log(state.listFeed);
       })
       .then(() => {
         state.form.process.state = 'sent';
