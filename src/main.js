@@ -7,47 +7,73 @@ import ru from '../locales/ru.js';
 import parseRss from './parser.js';
 
 const postUpdateCheck = (state) => {
-  state.urlList.forEach(({ feedId, url }) => {
-    const id = feedId;
-    const updetedURl = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
-    const request = axios.get(updetedURl);
+  const promises = state.urlList.map(({ feedId: id, url }) => {
+    const updatedURl = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+    const request = axios.get(updatedURl);
     const parsedRss = parseRss(request);
-
-    const currentPostsTitles = state.posts
-      .reduce((acc, { feedId, elements }) => {
-        if (feedId === id) {
-          acc = [...acc, ...elements];
-        }
-        return acc;
-      }, [])
-      .map(({ title }) => title);
-
-    parsedRss
-      .then((rss) => {
-        const newPostList = rss.querySelectorAll('item');
-        const newPostListElements = [];
-        newPostList.forEach((item) => {
-          const postTitle = item.querySelector('title').textContent;
-          if (!currentPostsTitles.includes(postTitle)) {
-            const postDescription = item.querySelector('description').textContent;
-            const link = item.querySelector('link').textContent;
-            newPostListElements.push({ title: postTitle, description: postDescription, link });
-          }
-        });
-        return newPostListElements;
-      })
-      .then((listOfNewPostElements) => {
-        console.log('11111');
-        if (listOfNewPostElements.length !== 0) {
-          state.posts.forEach(({ feedId, elements }) => {
-            if (feedId === id) {
-              elements = [...elements, ...listOfNewPostElements];
-            }
-          });
-        }
-      });
+    return parsedRss;
   });
-  setTimeout(postUpdateCheck, 5000, state);
+
+  const promise = Promise.all(promises);
+
+  promise.then((responses) => {
+    responses.forEach((rss) => {
+      console.log(rss);
+      // const newPostList = rss.querySelectorAll('item');
+      const newPostListElements = [];
+      // newPostList.forEach((item) => {
+      //   console.log(item);
+      //   const postTitle = item.querySelector('title').textContent;
+      //   if (!currentPostsTitles.includes(postTitle)) {
+      //     const postDescription = item.querySelector('description').textContent;
+      //     const link = item.querySelector('link').textContent;
+      //     newPostListElements.push({ title: postTitle, description: postDescription, link });
+      //   }
+      // });
+      return newPostListElements;
+    });
+    // return responses;
+  });
+
+  // state.urlList.forEach(({ feedId: id, url }) => {
+  //   const updatedURl = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+  //   const request = axios.get(updatedURl);
+  //   const parsedRss = parseRss(request);
+
+  //   const currentPostsTitles = state.posts
+  //     .reduce((acc, { feedId, elements }) => {
+  //       if (feedId === id) {
+  //         acc = [...acc, ...elements];
+  //       }
+  //       return acc;
+  //     }, [])
+  //     .map(({ title }) => title);
+
+  //   parsedRss
+  //     .then((rss) => {
+  //       const newPostList = rss.querySelectorAll('item');
+  //       const newPostListElements = [];
+  //       newPostList.forEach((item) => {
+  //         const postTitle = item.querySelector('title').textContent;
+  //         if (!currentPostsTitles.includes(postTitle)) {
+  //           const postDescription = item.querySelector('description').textContent;
+  //           const link = item.querySelector('link').textContent;
+  //           newPostListElements.push({ title: postTitle, description: postDescription, link });
+  //         }
+  //       });
+  //       return newPostListElements;
+  //     })
+  //     .then((listOfNewPostElements) => {
+  //       if (listOfNewPostElements.length !== 0) {
+  //         state.posts.forEach((post) => {
+  //           if (post.feedId === id) {
+  //             post.elements = [...post.elements, ...listOfNewPostElements];
+  //           }
+  //         });
+  //       }
+  //     });
+  // });
+  // setTimeout(postUpdateCheck, 5000, state);
 };
 
 const app = () => {
@@ -77,14 +103,15 @@ const app = () => {
     .then(() => {
       const state = onChange(initialState, view(initialState, i18nInstance));
 
-      postUpdateCheck(state);
+      // postUpdateCheck(state);
 
       const form = document.querySelector('.rss-form');
       form.addEventListener('submit', (e) => {
         e.preventDefault();
+        postUpdateCheck(state);
         const url = form.elements.url.value;
 
-        const currentUrlList = state.urlList.map(({ url }) => url);
+        const currentUrlList = state.urlList.map(({ url: urlElem }) => urlElem);
 
         const urlSchema = yup.object({
           url: yup.string().url('invalidLink').notOneOf(currentUrlList, 'alreadyAdded'),
@@ -127,7 +154,7 @@ const app = () => {
             state.form.process.state = 'filling';
             state.form.process.error = null;
             state.form.valid = null;
-            console.log(state);
+            // console.log(state);
           })
           .catch((error) => {
             state.form.process.error = error.message;

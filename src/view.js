@@ -22,6 +22,7 @@ export default (state, i18nInstance) => (path) => {
   const input = document.querySelector('#url-input');
   const form = document.querySelector('.rss-form');
   const sendingButton = document.querySelector('.btn-lg');
+  // console.log(path);
 
   switch (path) {
     case 'form.process.state': {
