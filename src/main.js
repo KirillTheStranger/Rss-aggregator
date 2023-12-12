@@ -6,12 +6,55 @@ import view from './view.js';
 import ru from '../locales/ru.js';
 import parseRss from './parser.js';
 
+const postUpdateCheck = (state) => {
+  state.urlList.forEach(({ feedId, url }) => {
+    const id = feedId;
+    const updetedURl = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+    const request = axios.get(updetedURl);
+    const parsedRss = parseRss(request);
+
+    const currentPostsTitles = state.posts
+      .reduce((acc, { feedId, elements }) => {
+        if (feedId === id) {
+          acc = [...acc, ...elements];
+        }
+        return acc;
+      }, [])
+      .map(({ title }) => title);
+
+    parsedRss
+      .then((rss) => {
+        const newPostList = rss.querySelectorAll('item');
+        const newPostListElements = [];
+        newPostList.forEach((item) => {
+          const postTitle = item.querySelector('title').textContent;
+          if (!currentPostsTitles.includes(postTitle)) {
+            const postDescription = item.querySelector('description').textContent;
+            const link = item.querySelector('link').textContent;
+            newPostListElements.push({ title: postTitle, description: postDescription, link });
+          }
+        });
+        return newPostListElements;
+      })
+      .then((listOfNewPostElements) => {
+        console.log('11111');
+        if (listOfNewPostElements.length !== 0) {
+          state.posts.forEach(({ feedId, elements }) => {
+            if (feedId === id) {
+              elements = [...elements, ...listOfNewPostElements];
+            }
+          });
+        }
+      });
+  });
+  setTimeout(postUpdateCheck, 5000, state);
+};
+
 const app = () => {
   const initialState = {
     form: {
       process: {
         state: 'filling', // sending sent error
-
         error: null, // invalidLink noRss alreadyAdded
       },
       valid: null, // true false
@@ -34,16 +77,21 @@ const app = () => {
     .then(() => {
       const state = onChange(initialState, view(initialState, i18nInstance));
 
+      postUpdateCheck(state);
+
       const form = document.querySelector('.rss-form');
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const url = form.elements.url.value;
 
+        const currentUrlList = state.urlList.map(({ url }) => url);
+
         const urlSchema = yup.object({
-          url: yup.string().url('invalidLink').notOneOf(state.urlList, 'alreadyAdded'),
+          url: yup.string().url('invalidLink').notOneOf(currentUrlList, 'alreadyAdded'),
         });
 
         const validation = urlSchema.validate({ url });
+
         const updetedURl = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
         const request = axios.get(updetedURl);
         const parsedRss = parseRss(request);
@@ -54,8 +102,8 @@ const app = () => {
 
         promises
           .then(([, rss]) => {
-            state.urlList.push(url);
             const feedId = state.lastFeedId + 1;
+            state.urlList.push({ feedId, url });
             state.lastFeedId = feedId;
 
             const feedTitle = rss.querySelector('title').textContent;
@@ -74,13 +122,12 @@ const app = () => {
             state.posts.push({ feedId, elements: postListElements });
             state.form.process.state = 'sent';
             state.form.valid = true;
-
-            // console.log(state);
           })
           .then(() => {
             state.form.process.state = 'filling';
             state.form.process.error = null;
             state.form.valid = null;
+            console.log(state);
           })
           .catch((error) => {
             state.form.process.error = error.message;

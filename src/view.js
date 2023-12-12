@@ -31,6 +31,11 @@ export default (state, i18nInstance) => (path) => {
           feedback.textContent = '';
           break;
         }
+        case 'error': {
+          sendingButton.removeAttribute('disabled');
+          feedback.textContent = `${i18nInstance.t(`errors.${state.form.process.error}`)}`;
+          break;
+        }
         case 'sent': {
           sendingButton.removeAttribute('disabled');
           break;
