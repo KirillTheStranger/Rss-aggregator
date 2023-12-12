@@ -6,5 +6,8 @@ export default {
       alreadyAdded: 'RSS уже существует',
       noRss: 'Ресурс не содержит валидный RSS',
     },
+    posts: 'Посты',
+    feeds: 'Фиды',
+    watchButton: 'Просмотр',
   },
 };
