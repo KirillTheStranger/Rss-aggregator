@@ -21,8 +21,26 @@ export default (state, i18nInstance) => (path) => {
   const feedback = document.querySelector('.feedback');
   const input = document.querySelector('#url-input');
   const form = document.querySelector('.rss-form');
+  const sendingButton = document.querySelector('.btn-lg');
 
   switch (path) {
+    case 'form.process.state': {
+      switch (state.form.process.state) {
+        case 'sending': {
+          sendingButton.setAttribute('disabled', '');
+          feedback.textContent = '';
+          break;
+        }
+        case 'sent': {
+          sendingButton.removeAttribute('disabled');
+          break;
+        }
+        default: {
+          // throw new Error(`Uknown error: ${state.form.process.state}`);
+        }
+      }
+      break;
+    }
     case 'form.process.error': {
       switch (state.form.process.error) {
         case 'invalidLink': {
@@ -54,7 +72,7 @@ export default (state, i18nInstance) => (path) => {
       const feedsBlock = document.querySelector('.feeds');
 
       if (!feedsBlock.hasChildNodes()) {
-        const cardBlock = createCardBody('Фиды');
+        const cardBlock = createCardBody(i18nInstance.t('feeds'));
         feedsBlock.append(cardBlock);
       }
 
@@ -82,7 +100,7 @@ export default (state, i18nInstance) => (path) => {
       // массив объектов {title: postTitle, description: postDescription, link}
 
       if (!postsBlock.hasChildNodes()) {
-        const cardBlock = createCardBody('Посты');
+        const cardBlock = createCardBody(i18nInstance.t('posts'));
         postsBlock.append(cardBlock);
       }
 
@@ -104,7 +122,7 @@ export default (state, i18nInstance) => (path) => {
         button.setAttribute('data-bs-toggle', 'modal');
         button.setAttribute('data-bs-target', '#modal');
         button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-        button.textContent = 'Просмотр';
+        button.textContent = i18nInstance.t('watchButton');
 
         listItem.append(link, button);
 
