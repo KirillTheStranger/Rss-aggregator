@@ -1,4 +1,4 @@
-### [Deeploy](https://frontend-project-11-kirills-projects-9df0e686.vercel.app/)
+### <a href="https://frontend-project-11-kirills-projects-9df0e686.vercel.app/" target="_blank">Deeploy</a>
 
 ### Hexlet tests and linter status:
 
