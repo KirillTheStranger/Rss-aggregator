@@ -127,6 +127,19 @@ export default (state, i18nInstance) => (path) => {
         button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
         button.textContent = i18nInstance.t('watchButton');
 
+        button.addEventListener('click', () => {
+          const modalHeader = document.querySelector('.modal-title');
+          modalHeader.textContent = post.title;
+
+          const modalBody = document.querySelector('.modal-body');
+          modalBody.textContent = post.description;
+
+          const buttonToFullArticle = document.querySelector('.full-article');
+          buttonToFullArticle.setAttribute('href', `${post.link}`);
+          link.classList.replace('fw-bold', 'fw-normal');
+          link.classList.add('link-secondary');
+        });
+
         listItem.append(link, button);
 
         return listItem;
