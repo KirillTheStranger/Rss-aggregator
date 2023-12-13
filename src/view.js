@@ -22,7 +22,6 @@ export default (state, i18nInstance) => (path) => {
   const input = document.querySelector('#url-input');
   const form = document.querySelector('.rss-form');
   const sendingButton = document.querySelector('.btn-lg');
-  // console.log(path);
 
   switch (path) {
     case 'form.process.state': {
@@ -101,9 +100,7 @@ export default (state, i18nInstance) => (path) => {
     }
     case 'posts': {
       const postsBlock = document.querySelector('.posts');
-      const [currentPost] = state.posts.filter((post) => post.feedId === state.lastFeedId);
-      const postList = currentPost.elements;
-      // массив объектов {title: postTitle, description: postDescription, link}
+      const postList = state.posts.flatMap((post) => post.elements);
 
       if (!postsBlock.hasChildNodes()) {
         const cardBlock = createCardBody(i18nInstance.t('posts'));
@@ -112,7 +109,7 @@ export default (state, i18nInstance) => (path) => {
 
       const listGroup = postsBlock.querySelector('.list-group');
 
-      postList.forEach((post) => {
+      const listItems = postList.map((post) => {
         const listItem = document.createElement('li');
         listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
 
@@ -132,8 +129,9 @@ export default (state, i18nInstance) => (path) => {
 
         listItem.append(link, button);
 
-        listGroup.prepend(listItem);
+        return listItem;
       });
+      listGroup.replaceChildren(...listItems.reverse());
 
       break;
     }
