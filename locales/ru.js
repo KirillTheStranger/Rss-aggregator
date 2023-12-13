@@ -3,6 +3,7 @@ export default {
     uploaded: 'RSS успешно загружен',
     errors: {
       invalidLink: 'Ссылка должна быть валидным URL',
+      badNetwork: 'Ошибка сети',
       alreadyAdded: 'RSS уже существует',
       noRss: 'Ресурс не содержит валидный RSS',
     },

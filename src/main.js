@@ -12,7 +12,7 @@ const app = () => {
     form: {
       process: {
         state: 'filling', // sending sent error
-        error: null, // invalidLink noRss alreadyAdded
+        error: null, // invalidLink noRss alreadyAdded badNetwork
       },
       valid: null, // true false
     },
