@@ -1,6 +1,6 @@
 # RSS Aggregator
 
-<h3><a href="https://frontend-project-11-kirills-projects-9df0e686.vercel.app/" target="_blank">Try it out on Vercel deeploy</a></h3>
+<h3><a href="https://frontend-project-11-kirills-projects-9df0e686.vercel.app/" target="_blank">Try it out on Vercel deploy</a></h3>
 
 ![img.png](public/readme_preview.png)
 
