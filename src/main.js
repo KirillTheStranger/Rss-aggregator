@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import axios from 'axios';
 import i18next from 'i18next';
 import view from './view.js';
-import ru from '../locales/ru.js';
+import ru from './locales/ru.js';
 import parseRss from './parser.js';
 import postUpdateCheck from './postUpdateChecker.js';
 
