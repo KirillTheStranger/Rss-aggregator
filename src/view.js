@@ -28,16 +28,20 @@ export default (state, i18nInstance) => (path) => {
       switch (state.form.process.state) {
         case 'sending': {
           sendingButton.setAttribute('disabled', '');
-          feedback.textContent = '';
+          feedback.textContent = 'RSS загружается';
+          feedback.classList.replace('text-danger', 'rss-uploading');
+          feedback.classList.replace('text-success', 'rss-uploading');
           break;
         }
         case 'error': {
           sendingButton.removeAttribute('disabled');
           feedback.textContent = `${i18nInstance.t(`errors.${state.form.process.error}`)}`;
+          feedback.classList.replace('rss-uploading', 'text-danger');
           break;
         }
         case 'sent': {
           sendingButton.removeAttribute('disabled');
+          feedback.classList.replace('rss-uploading', 'text-danger');
           break;
         }
         default: {
