@@ -4,13 +4,13 @@ import { fileURLToPath } from 'url';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 const config = {
   entry: './src/index.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(dirname, 'dist'),
   },
   devServer: {
     open: true,
@@ -30,7 +30,6 @@ const config = {
       },
       {
         test: /\.(js|jsx)$/i,
-        loader: 'babel-loader',
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
