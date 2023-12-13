@@ -58,8 +58,8 @@ export default (state, i18nInstance) => (path) => {
           input.classList.add('is-invalid');
           break;
         }
-        case 'badNetwork': {
-          feedback.textContent = i18nInstance.t('errors.badNetwork');
+        case 'network': {
+          feedback.textContent = i18nInstance.t('errors.network');
           input.classList.add('is-invalid');
           break;
         }

@@ -1,7 +1,7 @@
 const parseRss = (request) => {
   const parsedRss = request.then((response) => {
     if (response.status !== 200) {
-      throw new Error('badNetwork');
+      throw new Error('network');
     }
 
     const parser = new DOMParser();

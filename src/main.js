@@ -12,7 +12,7 @@ const app = () => {
     form: {
       process: {
         state: 'filling', // sending sent error
-        error: null, // invalidLink noRss alreadyAdded badNetwork
+        error: null, // invalidLink noRss alreadyAdded network
       },
       valid: null, // true false
     },
@@ -86,7 +86,11 @@ const app = () => {
             state.form.valid = null;
           })
           .catch((error) => {
-            state.form.process.error = error.message;
+            if (error.message === 'Network Error') {
+              state.form.process.error = 'network';
+            } else {
+              state.form.process.error = error.message;
+            }
             state.form.process.state = 'error';
             state.form.valid = false;
           });
