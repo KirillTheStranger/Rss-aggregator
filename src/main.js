@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-
 import onChange from 'on-change';
 import * as yup from 'yup';
 import axios from 'axios';
@@ -7,57 +5,7 @@ import i18next from 'i18next';
 import view from './view.js';
 import ru from '../locales/ru.js';
 import parseRss from './parser.js';
-
-const postUpdateCheck = (state) => {
-  const requests = state.urlList.map(({ url }) => {
-    const updatedURl = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
-    const response = parseRss(axios.get(updatedURl));
-    const parsedRss = response.then((rss) => rss);
-    return parsedRss;
-  });
-
-  const promise = Promise.all(requests);
-
-  promise
-    .then((rssList) => {
-      rssList.forEach((rss, index) => {
-        const newPostList = rss.querySelectorAll('item');
-        const newPostListElements = [];
-
-        const currentPostsTitles = state.posts
-          .reduce((acc, { feedId, elements }) => {
-            if (feedId === index + 1) {
-              acc = [...acc, ...elements];
-            }
-            return acc;
-          }, [])
-          .map(({ title }) => title);
-
-        newPostList.forEach((post) => {
-          const postTitle = post.querySelector('title').textContent;
-          if (!currentPostsTitles.includes(postTitle)) {
-            const postDescription = post.querySelector('description').textContent;
-            const link = post.querySelector('link').textContent;
-            newPostListElements.push({ title: postTitle, description: postDescription, link });
-          }
-        });
-
-        if (newPostListElements.length !== 0) {
-          state.posts.forEach((post) => {
-            if (post.feedId === index + 1) {
-              post.elements = [...post.elements, ...newPostListElements];
-            }
-          });
-        }
-      });
-    })
-    .catch((error) => {
-      state.form.process.error = error.message;
-      state.form.process.state = 'error';
-      state.form.valid = false;
-    });
-  setTimeout(postUpdateCheck, 5000, state);
-};
+import postUpdateCheck from './postUpdateChecker.js';
 
 const app = () => {
   const initialState = {
@@ -136,7 +84,6 @@ const app = () => {
             state.form.process.state = 'filling';
             state.form.process.error = null;
             state.form.valid = null;
-            // console.log(state);
           })
           .catch((error) => {
             state.form.process.error = error.message;
