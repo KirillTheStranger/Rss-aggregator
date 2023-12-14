@@ -22,6 +22,15 @@ const app = () => {
     lastFeedId: 0,
   };
 
+  const generateSchema = (state) => {
+    const currentUrlList = state.feeds.map(({ url }) => url);
+    const schema = yup.object({
+      url: yup.string().url('invalidLink').notOneOf(currentUrlList, 'alreadyAdded'),
+    });
+
+    return schema;
+  };
+
   const i18nInstance = i18next.createInstance();
 
   i18nInstance
@@ -41,54 +50,41 @@ const app = () => {
         e.preventDefault();
         const url = form.elements.url.value;
 
-        const currentUrlList = state.feeds.map(({ url: urlElem }) => urlElem);
-
-        const urlSchema = yup.object({
-          url: yup.string().url('invalidLink').notOneOf(currentUrlList, 'alreadyAdded'),
-        });
-
+        const urlSchema = generateSchema(state);
         const validation = urlSchema.validate({ url });
-
-        const updetedURl = generateUrl(url);
-        const request = axios.get(updetedURl);
-        const parsedRss = parseRss(request);
-
-        const promises = Promise.all([validation, parsedRss]);
-
-        state.form.process.state = 'sending';
-
-        promises
-          .then(([, rss]) => {
+        validation
+          .then(() => {
+            const updetedURl = generateUrl(url);
+            const request = axios.get(updetedURl);
+            state.form.process.state = 'sending';
+            return request;
+          })
+          .then((response) => {
+            state.form.process.state = 'sent';
+            const parsedRss = parseRss(response);
+            return parsedRss;
+          })
+          .then((data) => {
+            state.form.valid = true;
             const feedId = state.lastFeedId + 1;
             state.lastFeedId = feedId;
 
-            const feedTitle = rss.querySelector('title').textContent;
-            const feedDescription = rss.querySelector('description').textContent;
+            const [feed, posts] = data;
+
             state.feeds.push({
               id: feedId,
-              title: feedTitle,
-              description: feedDescription,
+              title: feed.title,
+              description: feed.description,
               url,
             });
 
-            const postList = rss.querySelectorAll('item');
-            const postListElements = [];
-            postList.forEach((item) => {
-              const postTitle = item.querySelector('title').textContent;
-              const postDescription = item.querySelector('description').textContent;
-              const link = item.querySelector('link').textContent;
-              postListElements.push({ title: postTitle, description: postDescription, link });
-            });
-
-            state.posts.push({ feedId, elements: postListElements });
-            state.form.process.state = 'sent';
-            state.form.valid = true;
+            state.posts.push({ feedId, elements: posts.elements });
           })
           .then(() => {
             state.form.process.state = 'filling';
             state.form.process.error = null;
             state.form.valid = null;
-            console.log(state);
+            // console.log(state);
           })
           .catch((error) => {
             if (error.message === 'Network Error') {
@@ -99,6 +95,60 @@ const app = () => {
             state.form.process.state = 'error';
             state.form.valid = false;
           });
+
+        // const urlSchema = generateSchema(state);
+        // const validation = urlSchema.validate({ url });
+
+        // const updetedURl = generateUrl(url);
+        // const request = axios.get(updetedURl);
+        // const parsedRss = parseRss(request);
+
+        // const promises = Promise.all([validation, parsedRss]);
+
+        // state.form.process.state = 'sending';
+
+        // promises
+        //   .then(([, rss]) => {
+        //     const feedId = state.lastFeedId + 1;
+        //     state.lastFeedId = feedId;
+
+        //     const feedTitle = rss.querySelector('title').textContent;
+        //     const feedDescription = rss.querySelector('description').textContent;
+        //     state.feeds.push({
+        //       id: feedId,
+        //       title: feedTitle,
+        //       description: feedDescription,
+        //       url,
+        //     });
+
+        //     const postList = rss.querySelectorAll('item');
+        //     const postListElements = [];
+        //     postList.forEach((item) => {
+        //       const postTitle = item.querySelector('title').textContent;
+        //       const postDescription = item.querySelector('description').textContent;
+        //       const link = item.querySelector('link').textContent;
+        //       postListElements.push({ title: postTitle, description: postDescription, link });
+        //     });
+
+        //     state.posts.push({ feedId, elements: postListElements });
+        //     state.form.process.state = 'sent';
+        //     state.form.valid = true;
+        //   })
+        //   .then(() => {
+        //     state.form.process.state = 'filling';
+        //     state.form.process.error = null;
+        //     state.form.valid = null;
+        //     console.log(state);
+        //   })
+        //   .catch((error) => {
+        //     if (error.message === 'Network Error') {
+        //       state.form.process.error = 'network';
+        //     } else {
+        //       state.form.process.error = error.message;
+        //     }
+        //     state.form.process.state = 'error';
+        //     state.form.valid = false;
+        //   });
       });
     });
 };
