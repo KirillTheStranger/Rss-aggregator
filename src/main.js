@@ -64,7 +64,12 @@ const app = () => {
 
             const feedTitle = rss.querySelector('title').textContent;
             const feedDescription = rss.querySelector('description').textContent;
-            state.feeds.push({ id: feedId, title: feedTitle, description: feedDescription, url });
+            state.feeds.push({
+              id: feedId,
+              title: feedTitle,
+              description: feedDescription,
+              url,
+            });
 
             const postList = rss.querySelectorAll('item');
             const postListElements = [];
