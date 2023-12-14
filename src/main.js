@@ -16,7 +16,6 @@ const app = () => {
       },
       valid: null, // true false
     },
-    urlList: [],
     feeds: [],
     posts: [],
     lastFeedId: 0,
@@ -41,7 +40,7 @@ const app = () => {
         e.preventDefault();
         const url = form.elements.url.value;
 
-        const currentUrlList = state.urlList.map(({ url: urlElem }) => urlElem);
+        const currentUrlList = state.feeds.map(({ url: urlElem }) => urlElem);
 
         const urlSchema = yup.object({
           url: yup.string().url('invalidLink').notOneOf(currentUrlList, 'alreadyAdded'),
@@ -60,12 +59,11 @@ const app = () => {
         promises
           .then(([, rss]) => {
             const feedId = state.lastFeedId + 1;
-            state.urlList.push({ feedId, url });
             state.lastFeedId = feedId;
 
             const feedTitle = rss.querySelector('title').textContent;
             const feedDescription = rss.querySelector('description').textContent;
-            state.feeds.push({ id: feedId, title: feedTitle, description: feedDescription });
+            state.feeds.push({ id: feedId, title: feedTitle, description: feedDescription, url });
 
             const postList = rss.querySelectorAll('item');
             const postListElements = [];
@@ -84,6 +82,7 @@ const app = () => {
             state.form.process.state = 'filling';
             state.form.process.error = null;
             state.form.valid = null;
+            console.log(state);
           })
           .catch((error) => {
             if (error.message === 'Network Error') {
