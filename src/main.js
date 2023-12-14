@@ -5,7 +5,8 @@ import i18next from 'i18next';
 import view from './view.js';
 import ru from './locales/ru.js';
 import parseRss from './parser.js';
-import postUpdateCheck from './postUpdateChecker.js';
+import postUpdateCheck from './helpers/postUpdateChecker.js';
+import generateUrl from './helpers/generateUrl.js';
 
 const app = () => {
   const initialState = {
@@ -48,7 +49,7 @@ const app = () => {
 
         const validation = urlSchema.validate({ url });
 
-        const updetedURl = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+        const updetedURl = generateUrl(url);
         const request = axios.get(updetedURl);
         const parsedRss = parseRss(request);
 

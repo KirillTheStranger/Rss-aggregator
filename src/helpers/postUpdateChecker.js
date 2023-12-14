@@ -1,11 +1,12 @@
 /* eslint-disable no-param-reassign */
 
 import axios from 'axios';
-import parseRss from './parser.js';
+import parseRss from '../parser.js';
+import generateUrl from './generateUrl.js';
 
 const postUpdateCheck = (state) => {
   const requests = state.feeds.map(({ url }) => {
-    const updatedURl = `https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`;
+    const updatedURl = generateUrl(url);
     const response = parseRss(axios.get(updatedURl));
     const parsedRss = response.then((rss) => rss);
     return parsedRss;
