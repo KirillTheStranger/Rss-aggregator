@@ -22,7 +22,12 @@ const parseRss = (response, feedId) => {
     const postTitle = item.querySelector('title').textContent;
     const postDescription = item.querySelector('description').textContent;
     const link = item.querySelector('link').textContent;
-    posts.push({ feedId, title: postTitle, description: postDescription, link });
+    posts.push({
+      feedId,
+      title: postTitle,
+      description: postDescription,
+      link,
+    });
   });
 
   return [feed, posts];
