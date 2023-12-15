@@ -52,23 +52,23 @@ const app = () => {
 
         const urlSchema = generateSchema(state);
         const validation = urlSchema.validate({ url });
+        const feedId = state.lastFeedId + 1;
+
         validation
           .then(() => {
-            const updetedURl = generateUrl(url);
-            const request = axios.get(updetedURl);
+            const updatedURl = generateUrl(url);
+            const request = axios.get(updatedURl);
             state.form.process.state = 'sending';
             return request;
           })
           .then((response) => {
             state.form.process.state = 'sent';
-            const parsedRss = parseRss(response);
+            const parsedRss = parseRss(response, feedId);
             return parsedRss;
           })
           .then((data) => {
             state.form.valid = true;
-            const feedId = state.lastFeedId + 1;
             state.lastFeedId = feedId;
-
             const [feed, posts] = data;
 
             state.feeds.push({
@@ -78,13 +78,12 @@ const app = () => {
               url,
             });
 
-            state.posts.push({ feedId, elements: posts.elements });
+            state.posts = [...state.posts, ...posts];
           })
           .then(() => {
             state.form.process.state = 'filling';
             state.form.process.error = null;
             state.form.valid = null;
-            // console.log(state);
           })
           .catch((error) => {
             if (error.message === 'Network Error') {
@@ -95,60 +94,6 @@ const app = () => {
             state.form.process.state = 'error';
             state.form.valid = false;
           });
-
-        // const urlSchema = generateSchema(state);
-        // const validation = urlSchema.validate({ url });
-
-        // const updetedURl = generateUrl(url);
-        // const request = axios.get(updetedURl);
-        // const parsedRss = parseRss(request);
-
-        // const promises = Promise.all([validation, parsedRss]);
-
-        // state.form.process.state = 'sending';
-
-        // promises
-        //   .then(([, rss]) => {
-        //     const feedId = state.lastFeedId + 1;
-        //     state.lastFeedId = feedId;
-
-        //     const feedTitle = rss.querySelector('title').textContent;
-        //     const feedDescription = rss.querySelector('description').textContent;
-        //     state.feeds.push({
-        //       id: feedId,
-        //       title: feedTitle,
-        //       description: feedDescription,
-        //       url,
-        //     });
-
-        //     const postList = rss.querySelectorAll('item');
-        //     const postListElements = [];
-        //     postList.forEach((item) => {
-        //       const postTitle = item.querySelector('title').textContent;
-        //       const postDescription = item.querySelector('description').textContent;
-        //       const link = item.querySelector('link').textContent;
-        //       postListElements.push({ title: postTitle, description: postDescription, link });
-        //     });
-
-        //     state.posts.push({ feedId, elements: postListElements });
-        //     state.form.process.state = 'sent';
-        //     state.form.valid = true;
-        //   })
-        //   .then(() => {
-        //     state.form.process.state = 'filling';
-        //     state.form.process.error = null;
-        //     state.form.valid = null;
-        //     console.log(state);
-        //   })
-        //   .catch((error) => {
-        //     if (error.message === 'Network Error') {
-        //       state.form.process.error = 'network';
-        //     } else {
-        //       state.form.process.error = error.message;
-        //     }
-        //     state.form.process.state = 'error';
-        //     state.form.valid = false;
-        //   });
       });
     });
 };

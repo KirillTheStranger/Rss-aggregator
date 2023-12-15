@@ -1,4 +1,4 @@
-const parseRss = (response) => {
+const parseRss = (response, feedId) => {
   if (response.status !== 200) {
     throw new Error('network');
   }
@@ -15,14 +15,14 @@ const parseRss = (response) => {
   const feedDescription = rss.querySelector('description').textContent;
 
   const feed = { title: feedTitle, description: feedDescription };
-  const posts = { elements: [] };
+  const posts = [];
 
   const postList = rss.querySelectorAll('item');
   postList.forEach((item) => {
     const postTitle = item.querySelector('title').textContent;
     const postDescription = item.querySelector('description').textContent;
     const link = item.querySelector('link').textContent;
-    posts.elements.push({ title: postTitle, description: postDescription, link });
+    posts.push({ feedId, title: postTitle, description: postDescription, link });
   });
 
   return [feed, posts];

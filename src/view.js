@@ -109,7 +109,7 @@ export default (state, i18nInstance) => (path) => {
     }
     case 'posts': {
       const postsBlock = document.querySelector('.posts');
-      const postList = state.posts.flatMap((post) => post.elements);
+      const postList = state.posts;
 
       if (!postsBlock.hasChildNodes()) {
         const cardBlock = createCardBody(i18nInstance.t('posts'));
