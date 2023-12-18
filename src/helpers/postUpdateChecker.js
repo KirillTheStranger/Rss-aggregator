@@ -7,18 +7,11 @@ import generateUrl from './generateUrl.js';
 const postUpdateCheck = (state) => {
   const requests = state.feeds.map(({ url }) => {
     const updatedUrl = generateUrl(url);
-    try {
-      const request = axios.get(updatedUrl);
-      return request;
-    } catch (error) {
-      if (error.message === 'Network Error') {
-        state.form.process.error = 'network';
-      } else {
-        state.form.process.error = error.message;
-      }
-      state.form.process.state = 'error';
-    }
-    return null;
+    const request = axios.get(updatedUrl);
+    request.catch((error) => {
+      console.log(`Recieve error in response - ${error.message}`);
+    });
+    return request;
   });
 
   const promise = Promise.all(requests);
@@ -41,6 +34,9 @@ const postUpdateCheck = (state) => {
       if (postsToAdd.length !== 0) {
         state.posts = [...state.posts, ...postsToAdd];
       }
+    })
+    .catch((error) => {
+      console.log(`Recieve error in parsing rss - ${error.message}`);
     })
     .then(() => {
       setTimeout(() => postUpdateCheck(state), 5000);
