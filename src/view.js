@@ -33,14 +33,21 @@ export default (state, i18nInstance) => (path) => {
           feedback.classList.replace('text-success', 'rss-uploading');
           break;
         }
-        case 'error': {
+        case 'sent': {
           sendingButton.removeAttribute('disabled');
-          feedback.textContent = `${i18nInstance.t(`errors.${state.form.process.error}`)}`;
           feedback.classList.replace('rss-uploading', 'text-danger');
           break;
         }
-        case 'sent': {
+        case 'uploaded': {
+          feedback.classList.replace('text-danger', 'text-success');
+          feedback.textContent = i18nInstance.t('uploaded');
+          form.reset();
+          input.focus();
+          break;
+        }
+        case 'error': {
           sendingButton.removeAttribute('disabled');
+          feedback.textContent = `${i18nInstance.t(`errors.${state.form.process.error}`)}`;
           feedback.classList.replace('rss-uploading', 'text-danger');
           break;
         }
@@ -155,19 +162,6 @@ export default (state, i18nInstance) => (path) => {
       });
       listGroup.replaceChildren(...listItems.reverse());
 
-      break;
-    }
-    case 'form.valid': {
-      if (state.form.valid === true) {
-        feedback.classList.replace('text-danger', 'text-success');
-        feedback.textContent = i18nInstance.t('uploaded');
-        form.reset();
-        input.focus();
-      }
-
-      if (state.form.valid === false) {
-        feedback.classList.replace('text-success', 'text-danger');
-      }
       break;
     }
     default: {

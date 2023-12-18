@@ -6,9 +6,9 @@ import generateUrl from './generateUrl.js';
 
 const postUpdateCheck = (state) => {
   const requests = state.feeds.map(({ url }) => {
-    const updatedURl = generateUrl(url);
+    const updatedUrl = generateUrl(url);
     try {
-      const request = axios.get(updatedURl);
+      const request = axios.get(updatedUrl);
       return request;
     } catch (error) {
       if (error.message === 'Network Error') {
@@ -17,7 +17,6 @@ const postUpdateCheck = (state) => {
         state.form.process.error = error.message;
       }
       state.form.process.state = 'error';
-      state.form.valid = false;
     }
     return null;
   });

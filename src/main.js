@@ -12,10 +12,9 @@ const app = () => {
   const initialState = {
     form: {
       process: {
-        state: 'filling', // sending sent error
+        state: 'filling', // sending sent uploaded error
         error: null, // invalidLink noRss alreadyAdded network
       },
-      valid: null, // true false
     },
     feeds: [],
     posts: [],
@@ -56,9 +55,9 @@ const app = () => {
 
         validation
           .then(() => {
+            state.form.process.state = 'sending';
             const updatedURl = generateUrl(url);
             const request = axios.get(updatedURl);
-            state.form.process.state = 'sending';
             return request;
           })
           .then((response) => {
@@ -67,14 +66,17 @@ const app = () => {
             return parsedRss;
           })
           .then((data) => {
-            state.form.valid = true;
+            state.form.process.state = 'uploaded';
             state.lastFeedId = feedId;
+
             const [feed, posts] = data;
+            const { title } = feed;
+            const { description } = feed;
 
             state.feeds.push({
               id: feedId,
-              title: feed.title,
-              description: feed.description,
+              title,
+              description,
               url,
             });
 
@@ -83,7 +85,6 @@ const app = () => {
           .then(() => {
             state.form.process.state = 'filling';
             state.form.process.error = null;
-            state.form.valid = null;
           })
           .catch((error) => {
             if (error.message === 'Network Error') {
@@ -92,7 +93,6 @@ const app = () => {
               state.form.process.error = error.message;
             }
             state.form.process.state = 'error';
-            state.form.valid = false;
           });
       });
     });
