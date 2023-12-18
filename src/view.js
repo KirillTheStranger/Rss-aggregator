@@ -17,11 +17,12 @@ const createCardBody = (cardTitle) => {
   return container;
 };
 
-export default (state, i18nInstance) => (path) => {
-  const feedback = document.querySelector('.feedback');
-  const input = document.querySelector('#url-input');
-  const form = document.querySelector('.rss-form');
-  const sendingButton = document.querySelector('.btn-lg');
+export default (state, i18nInstance, elements) => (path) => {
+  const {
+    feedback, input,
+    form, sendingButton,
+    feedsBlock, postsBlock,
+  } = elements;
 
   switch (path) {
     case 'form.process.state': {
@@ -38,6 +39,7 @@ export default (state, i18nInstance) => (path) => {
           feedback.classList.replace('rss-uploading', 'text-danger');
           break;
         }
+        case 'filling':
         case 'uploaded': {
           feedback.classList.replace('text-danger', 'text-success');
           feedback.textContent = i18nInstance.t('uploaded');
@@ -49,10 +51,11 @@ export default (state, i18nInstance) => (path) => {
           sendingButton.removeAttribute('disabled');
           feedback.textContent = `${i18nInstance.t(`errors.${state.form.process.error}`)}`;
           feedback.classList.replace('rss-uploading', 'text-danger');
+          feedback.classList.replace('text-success', 'text-danger');
           break;
         }
         default: {
-          // throw new Error(`Uknown error: ${state.form.process.state}`);
+          throw new Error(`Uknown error: ${state.form.process.state}`);
         }
       }
       break;
@@ -76,6 +79,7 @@ export default (state, i18nInstance) => (path) => {
         }
         case 'noRss': {
           feedback.textContent = i18nInstance.t('errors.noRss');
+          input.classList.add('is-invalid');
           break;
         }
         case null: {
@@ -83,14 +87,13 @@ export default (state, i18nInstance) => (path) => {
           break;
         }
         default: {
-          throw new Error(`Uknown error: ${state.form.process.error}`);
+          throw new Error(`Unknown error: ${state.form.process.error}`);
         }
       }
       break;
     }
     case 'feeds': {
       const [currentFeed] = state.feeds.filter((feed) => feed.id === state.lastFeedId);
-      const feedsBlock = document.querySelector('.feeds');
 
       if (!feedsBlock.hasChildNodes()) {
         const cardBlock = createCardBody(i18nInstance.t('feeds'));
@@ -115,7 +118,6 @@ export default (state, i18nInstance) => (path) => {
       break;
     }
     case 'posts': {
-      const postsBlock = document.querySelector('.posts');
       const postList = state.posts;
 
       if (!postsBlock.hasChildNodes()) {
@@ -164,8 +166,12 @@ export default (state, i18nInstance) => (path) => {
 
       break;
     }
+    case 'lastFeedId': {
+      console.log(`Last feed id has been updated, current id is ${state.lastFeedId}`);
+      break;
+    }
     default: {
-      // throw new Error(`Uknown path: ${path}`);
+      throw new Error(`Unknown path: ${path}`);
     }
   }
 };

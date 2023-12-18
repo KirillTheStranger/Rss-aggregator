@@ -21,6 +21,16 @@ const app = () => {
     lastFeedId: 0,
   };
 
+  const elements = {
+    feedback: document.querySelector('.feedback'),
+    input: document.querySelector('#url-input'),
+    form: document.querySelector('.rss-form'),
+    sendingButton: document.querySelector('.btn-lg'),
+    feedsBlock: document.querySelector('.feeds'),
+    postsBlock: document.querySelector('.posts'),
+    modal: document.querySelector('.modal'),
+  };
+
   const generateSchema = (state) => {
     const currentUrlList = state.feeds.map(({ url }) => url);
     const schema = yup.object({
@@ -40,7 +50,7 @@ const app = () => {
       },
     })
     .then(() => {
-      const state = onChange(initialState, view(initialState, i18nInstance));
+      const state = onChange(initialState, view(initialState, i18nInstance, elements));
 
       postUpdateCheck(state);
 
@@ -70,8 +80,7 @@ const app = () => {
             state.lastFeedId = feedId;
 
             const [feed, posts] = data;
-            const { title } = feed;
-            const { description } = feed;
+            const { title, description } = feed;
 
             state.feeds.push({
               id: feedId,
