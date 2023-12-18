@@ -1,13 +1,10 @@
 const parseRss = (response, feedId) => {
-  if (response.status !== 200) {
-    throw new Error('network');
-  }
-
   const parser = new DOMParser();
   const doc = parser.parseFromString(response.data.contents, 'application/xml');
   const rss = doc.querySelector('rss');
+  const parserError = doc.querySelector('parsererror');
 
-  if (!rss) {
+  if (parserError) {
     throw new Error('noRss');
   }
 
