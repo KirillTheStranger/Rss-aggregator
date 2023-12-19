@@ -18,6 +18,8 @@ const app = () => {
     },
     feeds: [],
     posts: [],
+    modalWindow: {},
+    watchedPostLinks: [],
     lastFeedId: 0,
   };
 
@@ -36,11 +38,10 @@ const app = () => {
 
   const generateSchema = (state) => {
     const currentUrlList = state.feeds.map(({ url }) => url);
-    const schema = yup.object({
+
+    return yup.object({
       url: yup.string().url('invalidLink').notOneOf(currentUrlList, 'alreadyAdded'),
     });
-
-    return schema;
   };
 
   const i18nInstance = i18next.createInstance();
@@ -82,7 +83,7 @@ const app = () => {
             state.form.process.state = 'uploaded';
             state.lastFeedId = feedId;
 
-            const [feed, posts] = data;
+            const { feed, posts } = data;
             const { title, description } = feed;
 
             state.feeds.push({
@@ -99,35 +100,20 @@ const app = () => {
             state.form.process.error = null;
           })
           .catch((error) => {
-            if (error.message === 'Network Error') {
-              state.form.process.error = 'network';
-            } else {
-              state.form.process.error = error.message;
-            }
+            state.form.process.error = error.message === 'Network Error' ? 'network' : error.message;
             state.form.process.state = 'error';
           });
       });
 
-      const {
-        modalWindow, modalTitle, modalBody, modalFullArticleButton,
-      } = elements;
-
-      modalWindow.addEventListener('show.bs.modal', (e) => {
+      elements.modalWindow.addEventListener('show.bs.modal', (e) => {
         const { parentNode } = e.relatedTarget;
-        const modalLink = parentNode.querySelector('a');
-        modalLink.classList.remove('fw-bold');
-        modalLink.classList.add('fw-normal', 'link-secondary');
 
-        const modalLinkValue = modalLink.getAttribute('href');
-        modalFullArticleButton.setAttribute('href', `${modalLinkValue}`);
+        const modalLink = parentNode.querySelector('a').getAttribute('href');
+        const post = state.posts.find((p) => p.link === modalLink);
 
-        const title = parentNode.querySelector('a').textContent;
-        modalTitle.textContent = title;
-
-        const [description] = state.posts
-          .filter((post) => post.link === modalLinkValue)
-          .map((post) => post.description);
-        modalBody.textContent = description;
+        state.modalWindow = { post };
+        console.log(state);
+        state.watchedPostLinks.push(modalLink);
       });
     });
 };
