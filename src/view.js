@@ -17,12 +17,82 @@ const createCardBody = (cardTitle) => {
   return container;
 };
 
+const addAttributesToElement = (element, arrOfAttributes) => {
+  arrOfAttributes.forEach(([attribute, value]) => {
+    element.setAttribute(attribute, value);
+  });
+};
+
 export default (state, i18nInstance, elements) => (path) => {
-  const {
-    feedback, input,
-    form, sendingButton,
-    feedsBlock, postsBlock,
-  } = elements;
+  const { feedback, input, form, sendingButton, feedsBlock, postsBlock } = elements;
+
+  const feedsRender = (state) => {
+    const [currentFeed] = state.feeds.filter((feed) => feed.id === state.lastFeedId);
+
+    if (!feedsBlock.hasChildNodes()) {
+      const cardBlock = createCardBody(i18nInstance.t('feeds'));
+      feedsBlock.append(cardBlock);
+    }
+
+    const listGroup = feedsBlock.querySelector('.list-group');
+
+    const listItem = document.createElement('li');
+    listItem.classList.add('list-group-item', 'border-0', 'border-end-0');
+
+    const listTitle = document.createElement('h3');
+    listTitle.classList.add('h6', 'm-0');
+    listTitle.textContent = currentFeed.title;
+
+    const listDescription = document.createElement('p');
+    listDescription.classList.add('m-0', 'small', 'text-black-50');
+    listDescription.textContent = currentFeed.description;
+
+    listItem.append(listTitle, listDescription);
+    listGroup.prepend(listItem);
+  };
+
+  const postsRender = (state) => {
+    const postList = state.posts;
+
+    if (!postsBlock.hasChildNodes()) {
+      const cardBlock = createCardBody(i18nInstance.t('posts'));
+      postsBlock.append(cardBlock);
+    }
+
+    const listGroup = postsBlock.querySelector('.list-group');
+
+    const listItems = postList.map((post) => {
+      const listItem = document.createElement('li');
+      listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+
+      const link = document.createElement('a');
+      const linkAttributes = [
+        ['href', `${post.link}`],
+        ['target', '_blank'],
+        ['rel', 'noopener noreferrer'],
+      ];
+      addAttributesToElement(link, linkAttributes);
+
+      link.classList.add('fw-bold');
+      link.textContent = `${post.title}`;
+
+      const button = document.createElement('button');
+      const buttonAttributes = [
+        ['type', 'button'],
+        ['data-bs-toggle', 'modal'],
+        ['data-bs-target', '#modal'],
+      ];
+      addAttributesToElement(button, buttonAttributes);
+
+      button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+      button.textContent = i18nInstance.t('watchButton');
+
+      listItem.append(link, button);
+
+      return listItem;
+    });
+    listGroup.replaceChildren(...listItems.reverse());
+  };
 
   switch (path) {
     case 'form.process.state': {
@@ -93,76 +163,12 @@ export default (state, i18nInstance, elements) => (path) => {
       break;
     }
     case 'feeds': {
-      const [currentFeed] = state.feeds.filter((feed) => feed.id === state.lastFeedId);
+      feedsRender(state);
 
-      if (!feedsBlock.hasChildNodes()) {
-        const cardBlock = createCardBody(i18nInstance.t('feeds'));
-        feedsBlock.append(cardBlock);
-      }
-
-      const listGroup = feedsBlock.querySelector('.list-group');
-
-      const listItem = document.createElement('li');
-      listItem.classList.add('list-group-item', 'border-0', 'border-end-0');
-
-      const listTitle = document.createElement('h3');
-      listTitle.classList.add('h6', 'm-0');
-      listTitle.textContent = currentFeed.title;
-
-      const listDescription = document.createElement('p');
-      listDescription.classList.add('m-0', 'small', 'text-black-50');
-      listDescription.textContent = currentFeed.description;
-
-      listItem.append(listTitle, listDescription);
-      listGroup.prepend(listItem);
       break;
     }
     case 'posts': {
-      const postList = state.posts;
-
-      if (!postsBlock.hasChildNodes()) {
-        const cardBlock = createCardBody(i18nInstance.t('posts'));
-        postsBlock.append(cardBlock);
-      }
-
-      const listGroup = postsBlock.querySelector('.list-group');
-
-      const listItems = postList.map((post) => {
-        const listItem = document.createElement('li');
-        listItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-
-        const link = document.createElement('a');
-        link.setAttribute('href', `${post.link}`);
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-        link.classList.add('fw-bold');
-        link.textContent = `${post.title}`;
-
-        const button = document.createElement('button');
-        button.setAttribute('type', 'button');
-        button.setAttribute('data-bs-toggle', 'modal');
-        button.setAttribute('data-bs-target', '#modal');
-        button.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-        button.textContent = i18nInstance.t('watchButton');
-
-        button.addEventListener('click', () => {
-          const modalHeader = document.querySelector('.modal-title');
-          modalHeader.textContent = post.title;
-
-          const modalBody = document.querySelector('.modal-body');
-          modalBody.textContent = post.description;
-
-          const buttonToFullArticle = document.querySelector('.full-article');
-          buttonToFullArticle.setAttribute('href', `${post.link}`);
-          link.classList.replace('fw-bold', 'fw-normal');
-          link.classList.add('link-secondary');
-        });
-
-        listItem.append(link, button);
-
-        return listItem;
-      });
-      listGroup.replaceChildren(...listItems.reverse());
+      postsRender(state);
 
       break;
     }
