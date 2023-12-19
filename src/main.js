@@ -28,7 +28,10 @@ const app = () => {
     sendingButton: document.querySelector('.btn-lg'),
     feedsBlock: document.querySelector('.feeds'),
     postsBlock: document.querySelector('.posts'),
-    modal: document.querySelector('.modal'),
+    modalWindow: document.querySelector('.modal'),
+    modalTitle: document.querySelector('.modal-title'),
+    modalBody: document.querySelector('.modal-body'),
+    modalFullArticleButton: document.querySelector('.full-article'),
   };
 
   const generateSchema = (state) => {
@@ -103,6 +106,24 @@ const app = () => {
             }
             state.form.process.state = 'error';
           });
+      });
+
+      const { modalWindow, modalTitle, modalBody, modalFullArticleButton } = elements;
+
+      modalWindow.addEventListener('show.bs.modal', (e) => {
+        const parentNode = e.relatedTarget.parentNode;
+        const modalLink = parentNode.querySelector('a');
+        modalLink.classList.remove('fw-bold');
+        modalLink.classList.add('fw-normal', 'link-secondary');
+
+        const modalLinkValue = modalLink.getAttribute('href');
+        modalFullArticleButton.setAttribute('href', `${modalLinkValue}`);
+
+        const title = parentNode.querySelector('a').textContent;
+        modalTitle.textContent = title;
+
+        const [description] = state.posts.filter((post) => post.link === modalLinkValue).map((post) => post.description);
+        modalBody.textContent = description;
       });
     });
 };
