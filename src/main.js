@@ -108,10 +108,12 @@ const app = () => {
           });
       });
 
-      const { modalWindow, modalTitle, modalBody, modalFullArticleButton } = elements;
+      const {
+        modalWindow, modalTitle, modalBody, modalFullArticleButton,
+      } = elements;
 
       modalWindow.addEventListener('show.bs.modal', (e) => {
-        const parentNode = e.relatedTarget.parentNode;
+        const { parentNode } = e.relatedTarget;
         const modalLink = parentNode.querySelector('a');
         modalLink.classList.remove('fw-bold');
         modalLink.classList.add('fw-normal', 'link-secondary');
@@ -122,7 +124,9 @@ const app = () => {
         const title = parentNode.querySelector('a').textContent;
         modalTitle.textContent = title;
 
-        const [description] = state.posts.filter((post) => post.link === modalLinkValue).map((post) => post.description);
+        const [description] = state.posts
+          .filter((post) => post.link === modalLinkValue)
+          .map((post) => post.description);
         modalBody.textContent = description;
       });
     });

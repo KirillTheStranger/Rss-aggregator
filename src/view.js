@@ -24,10 +24,14 @@ const addAttributesToElement = (element, arrOfAttributes) => {
 };
 
 export default (state, i18nInstance, elements) => (path) => {
-  const { feedback, input, form, sendingButton, feedsBlock, postsBlock } = elements;
+  const {
+    feedback, input,
+    form, sendingButton,
+    feedsBlock, postsBlock,
+  } = elements;
 
-  const feedsRender = (state) => {
-    const [currentFeed] = state.feeds.filter((feed) => feed.id === state.lastFeedId);
+  const feedsRender = (currentState) => {
+    const [currentFeed] = currentState.feeds.filter((feed) => feed.id === currentState.lastFeedId);
 
     if (!feedsBlock.hasChildNodes()) {
       const cardBlock = createCardBody(i18nInstance.t('feeds'));
@@ -51,8 +55,8 @@ export default (state, i18nInstance, elements) => (path) => {
     listGroup.prepend(listItem);
   };
 
-  const postsRender = (state) => {
-    const postList = state.posts;
+  const postsRender = (currentState) => {
+    const postList = currentState.posts;
 
     if (!postsBlock.hasChildNodes()) {
       const cardBlock = createCardBody(i18nInstance.t('posts'));
