@@ -27,7 +27,7 @@ const parseRss = (response, feedId) => {
     });
   });
 
-  return [feed, posts];
+  return { feed, posts };
 };
 
 export default parseRss;
