@@ -19,15 +19,11 @@ const postUpdateCheck = (state) => {
   promise
     .then((responses) => {
       const newPosts = responses.reduce((acc, response, index) => {
-        const [, posts] = parseRss(response, index + 1);
-        acc = [...acc, ...posts];
-        return acc;
+        const { posts } = parseRss(response, index + 1);
+        return [...acc, ...posts];
       }, []);
 
-      const currentPostsLinks = state.posts.map((post) => {
-        const { link } = post;
-        return link;
-      });
+      const currentPostsLinks = state.posts.map((post) => post.link);
 
       const postsToAdd = newPosts.filter((post) => !currentPostsLinks.includes(post.link));
 
@@ -39,7 +35,8 @@ const postUpdateCheck = (state) => {
       console.log(`Recieve error in parsing rss - ${error.message}`);
     })
     .then(() => {
-      setTimeout(() => postUpdateCheck(state), 5000);
+      const updateTimer = 5000;
+      setTimeout(() => postUpdateCheck(state), updateTimer);
     });
 };
 
