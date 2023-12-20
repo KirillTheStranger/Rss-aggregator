@@ -112,7 +112,6 @@ const app = () => {
         const post = state.posts.find((p) => p.link === modalLink);
 
         state.modalWindow = { post };
-        console.log(state);
         state.watchedPostLinks.push(modalLink);
       });
     });
