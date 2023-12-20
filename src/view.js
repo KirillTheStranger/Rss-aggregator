@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+/* eslint-disable no-unused-expressions */
 
 const createCardBody = (cardTitle) => {
   const container = document.createElement('div');
@@ -72,7 +73,7 @@ const postsRender = (currentState, i18nInstance, postsBlock) => {
     ];
     addAttributesToElement(link, linkAttributes);
 
-    link.classList.add('fw-bold');
+    currentState.watchedPostLinks.includes(post.link) ? link.classList.add('fw-normal', 'link-secondary') : link.classList.add('fw-bold');
     link.textContent = `${post.title}`;
 
     const button = document.createElement('button');
