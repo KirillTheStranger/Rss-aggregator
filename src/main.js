@@ -83,8 +83,10 @@ const app = () => {
             state.form.process.state = 'uploaded';
             state.lastFeedId = feedId;
 
-            const { feed, posts } = data;
-            const { title, description } = feed;
+            const {
+              feed: { title, description },
+              posts,
+            } = data;
 
             state.feeds.push({
               id: feedId,

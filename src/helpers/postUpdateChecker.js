@@ -34,7 +34,7 @@ const postUpdateCheck = (state) => {
     .catch((error) => {
       console.log(`Recieve error in parsing rss - ${error.message}`);
     })
-    .then(() => {
+    .finally(() => {
       const updateTimer = 5000;
       setTimeout(() => postUpdateCheck(state), updateTimer);
     });
