@@ -189,17 +189,16 @@ const renderWatchedPosts = (currentState, postsBlock) => {
   });
 };
 
-const renderLngChange = (
-  currentState,
-  i18nInstance,
-  currentValue,
-  feedback,
-  mainHeader,
-  mainParagraph,
-  exampleLink,
-  addButton,
-  placeholder,
-) => {
+const renderLngChange = (currentState, i18nInstance, currentValue, elements) => {
+  const {
+    feedback,
+    mainHeader,
+    mainParagraph,
+    exampleLink,
+    addButton,
+    placeholder,
+  } = elements;
+
   i18nInstance.changeLanguage(`${currentValue}`, (err, t) => {
     if (err) {
       throw new Error(`something went wrong loading: ${err}`);
@@ -212,7 +211,7 @@ const renderLngChange = (
       feedback.textContent = `${t('uploaded')}`;
     }
 
-    if (currentState.form.process.error === 'error') {
+    if (currentState.form.process.state === 'error') {
       feedback.textContent = `${t(`errors.${currentState.form.process.error}`)}`;
     }
 
@@ -244,11 +243,6 @@ export default (state, i18nInstance, elements) => (path, currentValue) => {
     modalBody,
     modalFullArticleButton,
     modalCloseButton,
-    mainHeader,
-    mainParagraph,
-    exampleLink,
-    addButton,
-    placeholder,
   } = elements;
 
   switch (path) {
@@ -288,17 +282,7 @@ export default (state, i18nInstance, elements) => (path, currentValue) => {
       break;
     }
     case 'lng': {
-      renderLngChange(
-        state,
-        i18nInstance,
-        currentValue,
-        feedback,
-        mainHeader,
-        mainParagraph,
-        exampleLink,
-        addButton,
-        placeholder,
-      );
+      renderLngChange(state, i18nInstance, currentValue, elements);
       break;
     }
     default: {
