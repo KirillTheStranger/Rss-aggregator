@@ -114,7 +114,20 @@ const app = () => {
         const post = state.posts.find((p) => p.link === modalLink);
 
         state.modalWindow = { post };
-        state.watchedPostLinks.push(modalLink);
+
+        if (!state.watchedPostLinks.includes(modalLink)) {
+          state.watchedPostLinks.push(modalLink);
+        }
+      });
+
+      elements.postsBlock.addEventListener('click', ({ target }) => {
+        if (target.tagName === 'A') {
+          const postLink = target.getAttribute('href');
+
+          if (!state.watchedPostLinks.includes(postLink)) {
+            state.watchedPostLinks.push(postLink);
+          }
+        }
       });
     });
 };
