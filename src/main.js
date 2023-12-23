@@ -4,12 +4,16 @@ import axios from 'axios';
 import i18next from 'i18next';
 import view from './view.js';
 import ru from './locales/ru.js';
+import en from './locales/en.js';
 import parseRss from './parser.js';
 import postUpdateCheck from './helpers/postUpdateChecker.js';
 import generateUrl from './helpers/generateUrl.js';
 
 const app = () => {
+  const defaultLanguage = 'ru';
+
   const initialState = {
+    lng: defaultLanguage,
     form: {
       process: {
         state: 'filling', // sending sent uploaded error
@@ -34,6 +38,13 @@ const app = () => {
     modalTitle: document.querySelector('.modal-title'),
     modalBody: document.querySelector('.modal-body'),
     modalFullArticleButton: document.querySelector('.full-article'),
+    modalCloseButton: document.querySelector('.close-button'),
+    mainHeader: document.querySelector('.main-header'),
+    mainParagraph: document.querySelector('.lead'),
+    exampleLink: document.querySelector('.example'),
+    addButton: document.querySelector('.add-button'),
+    placeholder: document.querySelector('[for="url-input"]'),
+    lngSelectors: document.querySelectorAll('.selectpicker'),
   };
 
   const generateSchema = (state) => {
@@ -48,9 +59,10 @@ const app = () => {
 
   i18nInstance
     .init({
-      lng: 'ru',
+      lng: defaultLanguage,
       resources: {
         ru,
+        en,
       },
     })
     .then(() => {
@@ -128,6 +140,14 @@ const app = () => {
             state.watchedPostLinks.push(postLink);
           }
         }
+      });
+
+      elements.lngSelectors.forEach((selector) => {
+        selector.addEventListener('click', ({ target }) => {
+          if (state.lng !== target.textContent) {
+            state.lng = target.textContent;
+          }
+        });
       });
     });
 };

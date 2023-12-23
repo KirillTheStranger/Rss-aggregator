@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-unused-expressions */
 
-const createCardBody = (cardTitle) => {
+const createCardBody = (cardTitle, cardClass) => {
   const container = document.createElement('div');
   container.classList.add('card', 'border-0');
 
@@ -9,7 +9,7 @@ const createCardBody = (cardTitle) => {
   cardBody.classList.add('card-body');
 
   const card = document.createElement('h2');
-  card.classList.add('card-title', 'h4');
+  card.classList.add('card-title', 'h4', cardClass);
   card.textContent = `${cardTitle}`;
   cardBody.append(card);
 
@@ -30,7 +30,7 @@ const feedsRender = (currentState, i18nInstance, feedsBlock) => {
   const [currentFeed] = currentState.feeds.filter((feed) => feed.id === currentState.lastFeedId);
 
   if (!feedsBlock.hasChildNodes()) {
-    const cardBlock = createCardBody(i18nInstance.t('feeds'));
+    const cardBlock = createCardBody(i18nInstance.t('feeds'), 'feedsHeader');
     feedsBlock.append(cardBlock);
   }
 
@@ -55,7 +55,7 @@ const postsRender = (currentState, i18nInstance, postsBlock) => {
   const postList = currentState.posts;
 
   if (!postsBlock.hasChildNodes()) {
-    const cardBlock = createCardBody(i18nInstance.t('posts'));
+    const cardBlock = createCardBody(i18nInstance.t('posts'), 'postsHeader');
     postsBlock.append(cardBlock);
   }
 
@@ -98,7 +98,7 @@ const feedBackRender = (currentState, i18nInstance, feedback, input, form, sendi
   switch (currentState.form.process.state) {
     case 'sending': {
       sendingButton.setAttribute('disabled', '');
-      feedback.textContent = 'RSS загружается';
+      feedback.textContent = i18nInstance.t('uploading');
       feedback.classList.replace('text-danger', 'rss-uploading');
       feedback.classList.replace('text-success', 'rss-uploading');
       break;
@@ -161,10 +161,19 @@ const errorRender = (currentState, i18nInstance, feedback, input) => {
   }
 };
 
-const renderModalWindow = (currentState, modalFullArticleButton, modalTitle, modalBody) => {
+const renderModalWindow = (
+  currentState,
+  i18nInstance,
+  modalFullArticleButton,
+  modalCloseButton,
+  modalTitle,
+  modalBody,
+) => {
   const { description, link, title } = currentState.modalWindow.post;
 
+  modalFullArticleButton.textContent = i18nInstance.t('modal.fullArticleButton');
   modalFullArticleButton.setAttribute('href', `${link}`);
+  modalCloseButton.textContent = i18nInstance.t('modal.closeButton');
 
   modalTitle.textContent = title;
   modalBody.textContent = description;
@@ -180,13 +189,66 @@ const renderWatchedPosts = (currentState, postsBlock) => {
   });
 };
 
-export default (state, i18nInstance, elements) => (path) => {
+const renderLngChange = (
+  currentState,
+  i18nInstance,
+  currentValue,
+  feedback,
+  mainHeader,
+  mainParagraph,
+  exampleLink,
+  addButton,
+  placeholder,
+) => {
+  i18nInstance.changeLanguage(`${currentValue}`, (err, t) => {
+    if (err) {
+      throw new Error(`something went wrong loading: ${err}`);
+    }
+    const feedsHeader = document.querySelector('.feedsHeader');
+    const postsHeader = document.querySelector('.postsHeader');
+    const watchButtons = document.querySelectorAll('.btn-outline-primary');
+
+    if (currentState.form.process.error === null && feedback.textContent !== '') {
+      feedback.textContent = `${t('uploaded')}`;
+    }
+
+    if (currentState.form.process.error === 'error') {
+      feedback.textContent = `${t(`errors.${currentState.form.process.error}`)}`;
+    }
+
+    mainHeader.textContent = `${t('mainHeader')}`;
+    mainParagraph.textContent = `${t('mainParagraph')}`;
+    exampleLink.textContent = `${t('exampleLink')}`;
+    addButton.textContent = `${t('addButton')}`;
+    placeholder.textContent = `${t('placeholder')}`;
+
+    if (postsHeader) {
+      feedsHeader.textContent = `${t('feeds')}`;
+      postsHeader.textContent = `${t('posts')}`;
+      watchButtons.forEach((button) => {
+        button.textContent = `${t('watchButton')}`;
+      });
+    }
+  });
+};
+
+export default (state, i18nInstance, elements) => (path, currentValue) => {
   const {
-    feedback, input,
-    form, sendingButton,
-    feedsBlock, postsBlock,
-    modalTitle, modalBody,
+    feedback,
+    input,
+    form,
+    sendingButton,
+    feedsBlock,
+    postsBlock,
+    modalTitle,
+    modalBody,
     modalFullArticleButton,
+    modalCloseButton,
+    mainHeader,
+    mainParagraph,
+    exampleLink,
+    addButton,
+    placeholder,
   } = elements;
 
   switch (path) {
@@ -211,11 +273,32 @@ export default (state, i18nInstance, elements) => (path) => {
       break;
     }
     case 'modalWindow': {
-      renderModalWindow(state, modalFullArticleButton, modalTitle, modalBody);
+      renderModalWindow(
+        state,
+        i18nInstance,
+        modalFullArticleButton,
+        modalCloseButton,
+        modalTitle,
+        modalBody,
+      );
       break;
     }
     case 'watchedPostLinks': {
       renderWatchedPosts(state, postsBlock);
+      break;
+    }
+    case 'lng': {
+      renderLngChange(
+        state,
+        i18nInstance,
+        currentValue,
+        feedback,
+        mainHeader,
+        mainParagraph,
+        exampleLink,
+        addButton,
+        placeholder,
+      );
       break;
     }
     default: {
