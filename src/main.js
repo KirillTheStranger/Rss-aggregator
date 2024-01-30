@@ -144,8 +144,8 @@ const app = () => {
 
       elements.lngSelectors.forEach((selector) => {
         selector.addEventListener('click', ({ target }) => {
-          if (state.lng !== target.name) {
-            state.lng = target.name;
+          if (state.lng !== target.dataset.name) {
+            state.lng = target.dataset.name;
           }
         });
       });
