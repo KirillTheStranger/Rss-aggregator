@@ -1,6 +1,6 @@
 # RSS Aggregator
 
-<h3><a href="https://rsswatcher.vercel.app/" target="_blank">Try it out on Vercel deploy</a></h3>
+<h3><a href="https://kir-chek-rss.vercel.app/" target="_blank">Try it out on Vercel deploy</a></h3>
 
 ![img.png](public/readme_preview.png)
 
