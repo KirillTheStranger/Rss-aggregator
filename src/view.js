@@ -205,7 +205,7 @@ const renderLngChange = (currentState, i18nInstance, currentValue, elements) => 
     }
     const feedsHeader = document.querySelector('.feedsHeader');
     const postsHeader = document.querySelector('.postsHeader');
-    const watchButtons = document.querySelectorAll('.btn-outline-primary');
+    const watchButtons = document.querySelectorAll('.btn-sm');
 
     if (currentState.form.process.error === null && feedback.textContent !== '') {
       feedback.textContent = `${t('uploaded')}`;
